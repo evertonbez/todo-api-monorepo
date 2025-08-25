@@ -102,7 +102,7 @@ export class TodoListComponent implements OnInit {
   private createForm(): FormGroup {
     return this.fb.group({
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(255)]],
-      price: [0, [Validators.required, Validators.min(0.01), Validators.max(1000000)]],
+      price: [0, [Validators.required, Validators.min(0.01), Validators.max(9999999999)]],
       limitDate: ['', Validators.required],
     });
   }

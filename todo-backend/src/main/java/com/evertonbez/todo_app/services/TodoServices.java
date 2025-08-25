@@ -2,6 +2,7 @@ package com.evertonbez.todo_app.services;
 
 import com.evertonbez.todo_app.dtos.ReorderRequest;
 import com.evertonbez.todo_app.entities.Todo;
+import com.evertonbez.todo_app.exception.NameExistsException;
 import com.evertonbez.todo_app.repositories.TodoRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class TodoServices {
         if (todo.getName() != null) {
             Optional<Todo> existingTodo = repository.findByName(todo.getName());
             if (existingTodo.isPresent() && !existingTodo.get().getId().equals(todo.getId())) {
-                throw new RuntimeException("NameExists:" + todo.getName());
+                throw new NameExistsException(todo.getName());
             }
         }
 
