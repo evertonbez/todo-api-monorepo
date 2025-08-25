@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:16.4
+    container_name: postgres-dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: todo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - todo-network
+
+  backend:
+    build: ./todo-backend
+    container_name: todo-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/todo
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 123456
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+    depends_on:
+      - postgres
+    networks:
+      - todo-network
+    restart: unless-stopped
+
+  frontend:
+    build: ./todo-frontend
+    container_name: todo-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - todo-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  todo-network:
+    driver: bridge

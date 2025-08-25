@@ -1,0 +1,242 @@
+<div class="container mx-auto p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Lista de Tarefas</h1>
+    <button
+      (click)="openCreateModal()"
+      class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+    >
+      + Nova Tarefa
+    </button>
+  </div>
+
+    <div class="space-y-4" *ngIf="todos$ | async as todos; else loading">
+    <div *ngIf="todos.length === 0" class="text-center py-8 text-gray-500">
+      <p class="text-lg">Nenhuma tarefa encontrada</p>
+      <p class="text-sm">Clique em "Nova Tarefa" para criar seu primeiro item</p>
+    </div>
+
+    <div 
+      cdkDropList 
+      (cdkDropListDropped)="onDrop($event)"
+      class="space-y-2"
+      *ngIf="todos.length > 0"
+    >
+      <div
+        *ngFor="let todo of todos; trackBy: trackByTodoId"
+        cdkDrag
+        class="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow relative"
+        [class.bg-yellow-100]="isHighValueTask(todo)"
+        [class.bg-white]="!isHighValueTask(todo)"
+        [class.border-yellow-300]="isHighValueTask(todo)"
+        [class.cdk-drag-animating]="isDragInProgress"
+      >
+        <div class="flex items-start gap-3">
+          <!-- Drag Handle -->
+          <div cdkDragHandle class="flex-shrink-0 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-gray-100 transition-colors">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+            </svg>
+          </div>
+
+          <!-- Content -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-2">
+              <h3 class="text-lg font-semibold text-gray-900 truncate">
+                {{ todo.name }}
+              </h3>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <span 
+                  *ngIf="isHighValueTask(todo)" 
+                  class="px-2 py-1 text-xs bg-yellow-500 text-yellow-900 rounded-full font-medium flex items-center gap-1"
+                  title="Tarefa de alto valor (≥ R$ 1.000)"
+                >
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"></path>
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"></path>
+                  </svg>
+                  Alto Valor
+                </span>
+                <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                  #{{ todo.id }}
+                </span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4 text-sm text-gray-600 mb-2">
+              <span 
+                class="font-medium"
+                [class.text-yellow-800]="isHighValueTask(todo)"
+                [class.font-bold]="isHighValueTask(todo)"
+              >
+                Preço: {{ formatCurrency(todo.price) }}
+              </span>
+              <span>
+                Limite: {{ formatDate(todo.limitDate) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-2 flex-shrink-0">
+            <button
+              (click)="openEditModal(todo)"
+              class="text-blue-500 hover:text-blue-700 text-sm px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+            >
+              Editar
+            </button>
+            <button
+              (click)="confirmDelete(todo)"
+              class="text-red-500 hover:text-red-700 text-sm px-2 py-1 rounded hover:bg-red-50 transition-colors"
+            >
+              Excluir
+            </button>
+          </div>
+        </div>
+
+        <!-- Drag Preview -->
+        <div *cdkDragPreview class="bg-white border border-gray-300 rounded-lg p-4 shadow-lg max-w-sm">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+            </svg>
+            <h3 class="text-lg font-semibold text-gray-900">{{ todo.name }}</h3>
+          </div>
+          <p class="text-sm text-gray-600 mt-1">{{ formatCurrency(todo.price) }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #loading>
+    <div class="text-center py-8">
+      <p class="text-gray-500">Carregando tarefas...</p>
+    </div>
+  </ng-template>
+</div>
+
+<!-- Modal para Criar/Editar -->
+<div *ngIf="isModalOpen" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold text-gray-800">
+        {{ isEditMode ? 'Editar Tarefa' : 'Nova Tarefa' }}
+      </h2>
+      <button
+        (click)="closeModal()"
+        class="text-gray-500 hover:text-gray-700"
+      >
+        ✕
+      </button>
+    </div>
+
+    <form [formGroup]="todoForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+          Nome *
+        </label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Digite o nome da tarefa"
+        />
+        <div
+          *ngIf="todoForm.get('name')?.invalid && todoForm.get('name')?.touched"
+          class="text-red-500 text-sm mt-1"
+        >
+          Nome é obrigatório
+        </div>
+      </div>
+
+      <div>
+        <label for="price" class="block text-sm font-medium text-gray-700 mb-1">
+          Preço *
+        </label>
+        <input
+          type="number"
+          id="price"
+          formControlName="price"
+          min="0"
+          step="0.01"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="0.00"
+        />
+        <div
+          *ngIf="todoForm.get('price')?.invalid && todoForm.get('price')?.touched"
+          class="text-red-500 text-sm mt-1"
+        >
+          Preço é obrigatório e deve ser maior que zero
+        </div>
+      </div>
+
+      <div>
+        <label for="limitDate" class="block text-sm font-medium text-gray-700 mb-1">
+          Data Limite *
+        </label>
+        <input
+          type="date"
+          id="limitDate"
+          formControlName="limitDate"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <div
+          *ngIf="todoForm.get('limitDate')?.invalid && todoForm.get('limitDate')?.touched"
+          class="text-red-500 text-sm mt-1"
+        >
+          Data limite é obrigatória
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button
+          type="submit"
+          [disabled]="todoForm.invalid || isSubmitting"
+          class="flex-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md transition-colors"
+        >
+          {{ isSubmitting ? 'Salvando...' : (isEditMode ? 'Atualizar' : 'Criar') }}
+        </button>
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-md transition-colors"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de Confirmação de Delete -->
+<div *ngIf="isDeleteModalOpen" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg p-6 w-full max-w-sm mx-4">
+    <div class="text-center">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+        <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.966-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Confirmar Exclusão</h3>
+      <p class="text-sm text-gray-500 mb-4">
+        Tem certeza que deseja excluir a tarefa "{{ todoToDelete?.name }}"?
+        Esta ação não pode ser desfeita.
+      </p>
+      <div class="flex gap-3">
+        <button
+          (click)="cancelDelete()"
+          class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-md transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="executeDelete()"
+          [disabled]="isDeletingTodo"
+          class="flex-1 bg-red-500 hover:bg-red-600 disabled:bg-red-400 text-white py-2 px-4 rounded-md transition-colors"
+        >
+          {{ isDeletingTodo ? 'Excluindo...' : 'Excluir' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 
