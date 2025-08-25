@@ -24,7 +24,6 @@ public class TodoServices {
     }
 
     public Todo save(Todo todo) {
-        // Verificar se já existe um todo com o mesmo nome
         if (todo.getName() != null) {
             Optional<Todo> existingTodo = repository.findByName(todo.getName());
             if (existingTodo.isPresent() && !existingTodo.get().getId().equals(todo.getId())) {
