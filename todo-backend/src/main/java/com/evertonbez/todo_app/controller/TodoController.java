@@ -16,6 +16,11 @@ public class TodoController {
     @Autowired
     private TodoServices service;
 
+    @GetMapping("/health")
+    public String health() {
+        return "OK";
+    }
+
     @GetMapping
     public List<Todo> getAll() {
         return service.findAll();
