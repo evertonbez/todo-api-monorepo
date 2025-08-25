@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root',
 })
 export class TodoService {
-  private readonly apiUrl = environment.apiUrl || 'http://localhost:8080/todos';
+  private readonly apiUrl = `${environment.apiUrl}/todos`;
   private todosSubject = new BehaviorSubject<Todo[]>([]);
   public todos$ = this.todosSubject.asObservable();
 

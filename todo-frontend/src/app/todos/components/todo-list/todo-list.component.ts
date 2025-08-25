@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -73,6 +73,8 @@ import { TodoService } from '../../services/todo.service';
   ],
 })
 export class TodoListComponent implements OnInit {
+  @ViewChild('nameInput') nameInput!: ElementRef<HTMLInputElement>;
+
   todos$: Observable<Todo[]>;
   todoForm: FormGroup;
 
@@ -100,7 +102,7 @@ export class TodoListComponent implements OnInit {
   private createForm(): FormGroup {
     return this.fb.group({
       name: ['', [Validators.required, Validators.minLength(1)]],
-      price: [0, [Validators.required, Validators.min(0.01)]],
+      price: [0, [Validators.required, Validators.pattern(/^\d+$/)]],
       limitDate: ['', Validators.required],
     });
   }
@@ -114,6 +116,7 @@ export class TodoListComponent implements OnInit {
       limitDate: '',
     });
     this.isModalOpen = true;
+    this.focusNameInput();
   }
 
   openEditModal(todo: Todo): void {
@@ -125,6 +128,7 @@ export class TodoListComponent implements OnInit {
       limitDate: todo.limitDate,
     });
     this.isModalOpen = true;
+    this.focusNameInput();
   }
 
   closeModal(): void {
@@ -237,5 +241,13 @@ export class TodoListComponent implements OnInit {
 
   private get todosSubject() {
     return this.todoService['todosSubject'];
+  }
+
+  private focusNameInput(): void {
+    setTimeout(() => {
+      if (this.nameInput?.nativeElement) {
+        this.nameInput.nativeElement.focus();
+      }
+    }, 100);
   }
 }
