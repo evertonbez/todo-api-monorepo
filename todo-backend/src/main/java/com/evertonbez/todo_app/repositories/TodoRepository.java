@@ -10,4 +10,6 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
 
     @Query("SELECT MAX(t.reOrder) FROM Todo t")
     Optional<Integer> findMaxReOrder();
+
+    Optional<Todo> findByName(String name);
 }

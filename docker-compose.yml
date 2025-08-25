@@ -19,7 +19,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://neondb_owner:npg_tYiVxIvX62Gu@ep-nameless-shape-a55rv6w8-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+      SPRING_DATASOURCE_URL: jdbc:postgresql://ep-nameless-shape-a55rv6w8-pooler.us-east-2.aws.neon.tech/neondb?user=neondb_owner&password=npg_tYiVxIvX62Gu&sslmode=require&channelBinding=require
       SPRING_DATASOURCE_USERNAME: neondb_owner
       SPRING_DATASOURCE_PASSWORD: npg_tYiVxIvX62Gu
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
