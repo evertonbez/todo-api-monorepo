@@ -21,20 +21,28 @@ export class TodoService {
     let errorMessage = 'Erro desconhecido ocorreu';
 
     if (error.error instanceof ErrorEvent) {
-      errorMessage = `Erro: ${error.error.message}`;
+      if (error.error.message.startsWith('NameExists')) {
+        errorMessage = 'Nome já existe';
+      } else {
+        errorMessage = `Erro: ${error.error.message}`;
+      }
     } else {
-      switch (error.status) {
-        case 400:
-          errorMessage = 'Dados inválidos enviados';
-          break;
-        case 404:
-          errorMessage = 'Recurso não encontrado';
-          break;
-        case 500:
-          errorMessage = 'Erro interno do servidor';
-          break;
-        default:
-          errorMessage = `Erro ${error.status}: ${error.message}`;
+      if (error.error.message.startsWith('NameExists')) {
+        errorMessage = 'Nome já existe';
+      } else {
+        switch (error.status) {
+          case 400:
+            errorMessage = 'Dados inválidos enviados';
+            break;
+          case 404:
+            errorMessage = 'Recurso não encontrado';
+            break;
+          case 500:
+            errorMessage = 'Erro interno do servidor';
+            break;
+          default:
+            errorMessage = `Erro ${error.status}: ${error.message}`;
+        }
       }
     }
 

@@ -27,7 +27,7 @@ public class TodoServices {
         if (todo.getName() != null) {
             Optional<Todo> existingTodo = repository.findByName(todo.getName());
             if (existingTodo.isPresent() && !existingTodo.get().getId().equals(todo.getId())) {
-                throw new RuntimeException("Já existe um todo com o nome: " + todo.getName());
+                throw new RuntimeException("NameExists:" + todo.getName());
             }
         }
 

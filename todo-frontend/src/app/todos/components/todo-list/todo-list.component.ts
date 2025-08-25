@@ -101,8 +101,8 @@ export class TodoListComponent implements OnInit {
 
   private createForm(): FormGroup {
     return this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(1)]],
-      price: [0, [Validators.required, Validators.pattern(/^\d+$/)]],
+      name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(255)]],
+      price: [0, [Validators.required, Validators.min(0.01), Validators.max(1000000)]],
       limitDate: ['', Validators.required],
     });
   }
@@ -151,7 +151,10 @@ export class TodoListComponent implements OnInit {
               this.closeModal();
             }
           },
-          error: () => {
+          error: (error) => {
+            if (error.message === 'Nome já existe') {
+              this.todoForm.get('name')?.setErrors({ duplicate: 'Nome da tarefa já existe' });
+            }
             this.isSubmitting = false;
           },
         });
@@ -160,7 +163,10 @@ export class TodoListComponent implements OnInit {
           next: () => {
             this.closeModal();
           },
-          error: () => {
+          error: (error) => {
+            if (error.message === 'Nome já existe') {
+              this.todoForm.get('name')?.setErrors({ duplicate: 'Nome da tarefa já existe' });
+            }
             this.isSubmitting = false;
           },
         });
